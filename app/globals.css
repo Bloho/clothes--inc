@@ -35,6 +35,12 @@ button {
   font: inherit;
 }
 
+input,
+select {
+  color: inherit;
+  font: inherit;
+}
+
 .wardrobe-shell {
   display: grid;
   grid-template-columns: 155px minmax(0, 1fr);
@@ -53,6 +59,8 @@ button {
 .sidebar {
   position: sticky;
   top: 58px;
+  display: flex;
+  flex-direction: column;
   align-self: start;
   min-height: calc(100vh - 86px);
 }
@@ -93,7 +101,12 @@ button {
 
 .item-card:focus-visible,
 .nav-arrow:focus-visible,
-.overlay-hitarea:focus-visible {
+.overlay-hitarea:focus-visible,
+.profile-action:focus-visible,
+.empty-action:focus-visible,
+.upload-preview button:focus-visible,
+.upload-actions button:focus-visible,
+.detail-remove:focus-visible {
   outline: 1px solid var(--focus);
   outline-offset: 3px;
 }
@@ -149,7 +162,105 @@ button {
   transform: scale(1.055);
 }
 
-.detail-overlay {
+.empty-wardrobe {
+  position: fixed;
+  top: 50%;
+  left: calc(155px + 28px);
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  transform: translateY(-50%);
+}
+
+.empty-wardrobe p {
+  margin: 0;
+}
+
+.empty-action,
+.profile-action,
+.detail-remove {
+  width: fit-content;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+}
+
+.profile-panel {
+  display: grid;
+  gap: 8px;
+  width: 120px;
+  margin-top: auto;
+}
+
+.profile-panel--loading {
+  color: var(--muted);
+}
+
+.profile-identity {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: #6f6f6f;
+  font-size: 10px;
+  object-fit: cover;
+}
+
+.profile-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.profile-copy strong,
+.profile-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-copy strong {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.profile-copy span,
+.profile-note {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.profile-note {
+  margin: 0;
+}
+
+.profile-action {
+  color: var(--muted);
+  transition: color 140ms ease;
+}
+
+.profile-action:hover,
+.profile-action--primary {
+  color: var(--text);
+}
+
+.detail-overlay,
+.upload-overlay {
   position: fixed;
   inset: 0;
   display: grid;
@@ -161,7 +272,8 @@ button {
   transition: opacity 180ms ease;
 }
 
-.detail-overlay.is-open {
+.detail-overlay.is-open,
+.upload-overlay.is-open {
   opacity: 1;
   pointer-events: auto;
 }
@@ -234,6 +346,16 @@ button {
   line-height: 1.15;
 }
 
+.detail-remove {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.detail-remove:hover {
+  color: var(--text);
+}
+
 .nav-arrow {
   position: absolute;
   top: 50%;
@@ -272,6 +394,146 @@ button {
   right: 16px;
 }
 
+.upload-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 210px;
+  gap: 18px;
+  width: min(620px, calc(100vw - 48px));
+  padding: 17px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+}
+
+.upload-preview {
+  display: grid;
+  place-items: center;
+  min-height: 318px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.upload-preview img {
+  display: block;
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
+.upload-preview button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.upload-fields {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.upload-fields label {
+  display: grid;
+  gap: 4px;
+}
+
+.upload-fields span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.upload-fields input,
+.upload-fields select {
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #fff;
+  padding: 0 8px;
+}
+
+.upload-fields input:focus,
+.upload-fields select:focus {
+  border-color: var(--focus);
+  outline: 0;
+}
+
+.upload-mode {
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.upload-mode label {
+  display: grid;
+  place-items: center;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.upload-mode label.is-active {
+  color: var(--text);
+  border-color: #bdbdbd;
+}
+
+.upload-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.upload-error {
+  grid-column: 2;
+  margin: 0;
+  color: #8b2020;
+  font-size: 11px;
+}
+
+.upload-actions {
+  display: flex;
+  grid-column: 2;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.upload-actions button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.upload-actions .upload-submit {
+  color: var(--text);
+}
+
+.upload-actions button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
 @media (max-width: 520px) {
   .wardrobe-shell {
     grid-template-columns: 1fr;
@@ -280,6 +542,7 @@ button {
 
   .sidebar {
     position: static;
+    display: block;
     min-height: 0;
   }
 
@@ -304,6 +567,17 @@ button {
     max-width: none;
   }
 
+  .profile-panel {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .empty-wardrobe {
+    position: static;
+    margin-top: 32px;
+    transform: none;
+  }
+
   .detail-card {
     min-height: 352px;
     padding: 14px 42px 15px;
@@ -319,5 +593,20 @@ button {
 
   .nav-arrow--next {
     right: 10px;
+  }
+
+  .upload-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .upload-preview {
+    min-height: 250px;
+  }
+
+  .upload-mode,
+  .upload-error,
+  .upload-actions {
+    grid-column: 1;
   }
 }
