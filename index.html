@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clothes</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wardrobe-shell" id="app">
+      <aside class="sidebar" aria-label="Wardrobe categories">
+        <h1>Clothes</h1>
+        <nav class="category-list" id="categoryList"></nav>
+      </aside>
+
+      <main class="wardrobe-stage" aria-label="Wardrobe items">
+        <div class="wardrobe-grid" id="wardrobeGrid"></div>
+      </main>
+    </div>
+
+    <div class="detail-overlay" id="detailOverlay" aria-hidden="true">
+      <button class="overlay-hitarea" type="button" aria-label="Close item detail"></button>
+      <section class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle" tabindex="-1">
+        <button class="nav-arrow nav-arrow--prev" type="button" aria-label="Previous item">
+          <span aria-hidden="true">‹</span>
+        </button>
+
+        <div class="detail-image-frame">
+          <img id="detailImage" alt="" />
+        </div>
+
+        <div class="detail-copy">
+          <h2 id="detailTitle"></h2>
+          <p id="detailBrand"></p>
+          <p id="detailColor"></p>
+        </div>
+
+        <button class="nav-arrow nav-arrow--next" type="button" aria-label="Next item">
+          <span aria-hidden="true">›</span>
+        </button>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
