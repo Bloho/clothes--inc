@@ -1,10 +1,14 @@
 "use client";
 
+import { upload as uploadBlob } from "@vercel/blob/client";
 import { useEffect, useRef, useState } from "react";
 import { categories } from "../lib/categories";
 
 const emptySession = {
   aiAvailable: false,
+  authSecretConfigured: false,
+  blobConfigured: false,
+  databaseConfigured: false,
   googleConfigured: false,
   loading: true,
   user: null,
@@ -146,12 +150,53 @@ export default function Home() {
     setIsSubmitting(true);
     setUploadError("");
 
-    const formData = new FormData(event.currentTarget);
-    formData.set("sortMode", upload.sortMode);
+    const file = fileInputRef.current?.files?.[0];
+
+    if (!file) {
+      setIsSubmitting(false);
+      setUploadError("Choose an image");
+      return;
+    }
+
+    if (!session.blobConfigured) {
+      setIsSubmitting(false);
+      setUploadError("Blob storage is not configured");
+      return;
+    }
+
+    if (!session.databaseConfigured) {
+      setIsSubmitting(false);
+      setUploadError("Database is not configured");
+      return;
+    }
+
+    let blob;
+
+    try {
+      blob = await uploadBlob(`wardrobe/${session.user.id}/${cleanFileName(file.name)}`, file, {
+        access: "public",
+        handleUploadUrl: "/api/wardrobe/blob",
+      });
+    } catch (error) {
+      setIsSubmitting(false);
+      setUploadError(error.message || "Image upload failed");
+      return;
+    }
 
     const response = await fetch("/api/wardrobe/upload", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        brand: upload.brand,
+        category: upload.category,
+        color: upload.color,
+        imageUrl: blob.url,
+        name: upload.name,
+        pathname: blob.pathname,
+        sortMode: upload.sortMode,
+      }),
     });
 
     const result = await response.json();
@@ -230,6 +275,8 @@ export default function Home() {
             loading={session.loading}
             onOpenUpload={openUpload}
             onSignOut={handleSignOut}
+            authReady={session.authSecretConfigured}
+            storageReady={session.blobConfigured && session.databaseConfigured}
             user={session.user}
           />
         </aside>
@@ -262,6 +309,8 @@ export default function Home() {
 
       <UploadDialog
         aiAvailable={session.aiAvailable}
+        blobConfigured={session.blobConfigured}
+        databaseConfigured={session.databaseConfigured}
         error={uploadError}
         fileInputRef={fileInputRef}
         isOpen={isUploadOpen}
@@ -277,7 +326,7 @@ export default function Home() {
   );
 }
 
-function ProfilePanel({ googleConfigured, loading, onOpenUpload, onSignOut, user }) {
+function ProfilePanel({ authReady, googleConfigured, loading, onOpenUpload, onSignOut, storageReady, user }) {
   if (loading) {
     return <div className="profile-panel profile-panel--loading">Loading</div>;
   }
@@ -288,6 +337,7 @@ function ProfilePanel({ googleConfigured, loading, onOpenUpload, onSignOut, user
         <a className="profile-action profile-action--primary" href="/api/auth/google">
           Sign in with Google
         </a>
+        {!authReady ? <p className="profile-note">Auth secret needed</p> : null}
         {!googleConfigured ? <p className="profile-note">Google setup needed</p> : null}
       </div>
     );
@@ -305,6 +355,8 @@ function ProfilePanel({ googleConfigured, loading, onOpenUpload, onSignOut, user
       <button className="profile-action profile-action--primary" type="button" onClick={onOpenUpload}>
         Upload
       </button>
+      {!storageReady ? <p className="profile-note">Storage setup needed</p> : null}
+      {!authReady ? <p className="profile-note">Auth secret needed</p> : null}
       <button className="profile-action" type="button" onClick={onSignOut}>
         Sign out
       </button>
@@ -360,7 +412,9 @@ function ItemDetail({ activeItem, isOpen, moveDetail, onClose, onRemove }) {
   );
 }
 
-function UploadDialog({ aiAvailable, error, fileInputRef, isOpen, isSubmitting, onChange, onClose, onFileChange, onSubmit, previewUrl, upload }) {
+function UploadDialog({ aiAvailable, blobConfigured, databaseConfigured, error, fileInputRef, isOpen, isSubmitting, onChange, onClose, onFileChange, onSubmit, previewUrl, upload }) {
+  const storageReady = blobConfigured && databaseConfigured;
+
   return (
     <div className={`upload-overlay${isOpen ? " is-open" : ""}`} aria-hidden={!isOpen}>
       <button className="overlay-hitarea" type="button" aria-label="Close upload" onClick={onClose} />
@@ -414,13 +468,14 @@ function UploadDialog({ aiAvailable, error, fileInputRef, isOpen, isSubmitting, 
             </div>
           ) : null}
 
+          {!storageReady ? <p className="upload-error">Connect Vercel Blob and Postgres before uploading.</p> : null}
           {error ? <p className="upload-error">{error}</p> : null}
 
           <div className="upload-actions">
             <button type="button" onClick={onClose}>
               Cancel
             </button>
-            <button className="upload-submit" disabled={isSubmitting} type="submit">
+            <button className="upload-submit" disabled={isSubmitting || !storageReady} type="submit">
               {isSubmitting ? "Saving" : "Save"}
             </button>
           </div>
@@ -438,4 +493,12 @@ function getInitials(name) {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
+}
+
+function cleanFileName(fileName) {
+  return String(fileName || "upload")
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }

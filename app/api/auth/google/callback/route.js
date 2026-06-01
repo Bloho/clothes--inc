@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { SESSION_COOKIE, STATE_COOKIE, createSessionValue, getSessionCookieOptions, getUserId, isGoogleConfigured } from "../../../../../lib/auth";
-import { saveUserProfile } from "../../../../../lib/storage";
+import { upsertUserProfile } from "../../../../../lib/storage";
 
 export const runtime = "nodejs";
 
@@ -61,10 +61,14 @@ export async function GET(request) {
   response.cookies.set(SESSION_COOKIE, sessionValue, getSessionCookieOptions());
   response.cookies.delete(STATE_COOKIE);
 
-  await saveUserProfile({
-    id: getUserId(user.email),
-    ...user,
-  });
+  try {
+    await upsertUserProfile({
+      id: getUserId(user.email),
+      ...user,
+    });
+  } catch {
+    return NextResponse.redirect(`${origin}/?auth=storage-not-configured`);
+  }
 
   return response;
 }
