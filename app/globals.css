@@ -412,7 +412,8 @@ select {
   padding: 28px 24px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   text-align: center;
 }
