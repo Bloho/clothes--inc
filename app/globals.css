@@ -401,7 +401,7 @@ select {
   display: grid;
   place-items: center;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.108);
+  background: rgba(255, 255, 255, 0.073);
   border-radius: 6px;
 }
 
@@ -411,7 +411,7 @@ select {
   width: 260px;
   padding: 28px 24px;
   border-radius: 16px;
-  background: #ebe9e9;
+  background: #ebe9e942;
   text-align: center;
 }
 
