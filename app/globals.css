@@ -124,9 +124,8 @@ select {
 
 .wardrobe-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  column-gap: clamp(28px, 2.2vw, 58px);
-  row-gap: clamp(16px, 2vw, 28px);
+  grid-template-columns: repeat(auto-fill, 108px);
+  gap: 16px;
   width: 100%;
 }
 
@@ -601,9 +600,8 @@ select {
   }
 
   .wardrobe-grid {
-    grid-template-columns: repeat(2, minmax(118px, 1fr));
-    column-gap: 24px;
-    row-gap: 26px;
+    grid-template-columns: repeat(2, 108px);
+    gap: 12px;
     max-width: none;
   }
 
