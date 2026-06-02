@@ -259,9 +259,12 @@ select {
   color: var(--text);
 }
 
-.profile-btn {
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
-  padding: 7px 0;
+  padding: 8px 12px;
   border: 0;
   border-radius: 8px;
   background: #f0f0f0;
@@ -269,11 +272,12 @@ select {
   cursor: pointer;
   font: inherit;
   font-size: 12px;
-  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
   transition: background-color 140ms ease;
 }
 
-.profile-btn:hover {
+.google-signin-btn:hover {
   background: #e4e4e4;
 }
 
