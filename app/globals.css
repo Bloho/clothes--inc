@@ -429,9 +429,9 @@ select {
 .confirm-yes {
   width: 100%;
   padding: 12px 0;
-  border: 1.5px solid #cc0000;
+  border: 1.5px solid #FF525F;
   border-radius: 10px;
-  background: #e113007d;
+  background: #FF5968;
   color: #cc0000;
   cursor: pointer;
   font: inherit;
