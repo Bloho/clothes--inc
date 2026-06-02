@@ -124,7 +124,7 @@ select {
 
 .wardrobe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(clamp(112px, 8vw, 168px), 1fr));
+  grid-template-columns: repeat(4, 1fr);
   column-gap: clamp(28px, 2.2vw, 58px);
   row-gap: clamp(38px, 5vw, 70px);
   width: 100%;
