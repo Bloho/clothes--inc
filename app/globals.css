@@ -126,7 +126,7 @@ select {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   column-gap: clamp(28px, 2.2vw, 58px);
-  row-gap: clamp(38px, 5vw, 70px);
+  row-gap: clamp(16px, 2vw, 28px);
   width: 100%;
 }
 
