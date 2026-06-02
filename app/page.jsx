@@ -352,16 +352,15 @@ function ProfilePanel({ authReady, googleConfigured, loading, onOpenUpload, onSi
       <div className="profile-identity">
         {user.picture ? <img alt="" className="profile-avatar" src={user.picture} /> : <span className="profile-avatar">{getInitials(user.name)}</span>}
         <div className="profile-copy">
-          <strong>{user.name}</strong>
-          <span>{user.email}</span>
+          <strong>{user.name.split(" ")[0]}</strong>
         </div>
       </div>
-      <button className="profile-action profile-action--primary" type="button" onClick={onOpenUpload}>
+      <button className="profile-btn" type="button" onClick={onOpenUpload}>
         Upload
       </button>
       {!storageReady ? <p className="profile-note">Storage setup needed</p> : null}
       {!authReady ? <p className="profile-note">Auth secret needed</p> : null}
-      <button className="profile-action" type="button" onClick={onSignOut}>
+      <button className="profile-btn" type="button" onClick={onSignOut}>
         Sign out
       </button>
     </div>
