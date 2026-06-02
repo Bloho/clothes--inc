@@ -124,8 +124,8 @@ select {
 
 .wardrobe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 150px);
-  gap: 0px;
+  grid-template-columns: repeat(auto-fill, 108px);
+  gap: 16px;
   width: 100%;
 }
 
@@ -393,6 +393,62 @@ select {
 
 .detail-remove:hover {
   color: var(--text);
+}
+
+.confirm-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+}
+
+.confirm-card {
+  display: grid;
+  gap: 12px;
+  width: 260px;
+  padding: 28px 24px;
+  border-radius: 16px;
+  background: #ebe9e9;
+  text-align: center;
+}
+
+.confirm-message {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.confirm-yes {
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #f4b8b8;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 140ms ease;
+}
+
+.confirm-yes:hover {
+  background: #edaaaa;
+}
+
+.confirm-cancel {
+  width: 100%;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
 }
 
 .nav-arrow {

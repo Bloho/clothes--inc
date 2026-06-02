@@ -32,6 +32,7 @@ export default function Home() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   const activeItem = activeIndex === null ? null : items[activeIndex];
@@ -237,6 +238,15 @@ export default function Home() {
     const result = await response.json();
     setItems(result.items || []);
     setActiveIndex(null);
+    setIsConfirmOpen(false);
+  }
+
+  function handleRemoveClick() {
+    setIsConfirmOpen(true);
+  }
+
+  function handleCancelRemove() {
+    setIsConfirmOpen(false);
   }
 
   return (
@@ -305,7 +315,7 @@ export default function Home() {
         </main>
       </div>
 
-      <ItemDetail activeItem={activeItem} isOpen={Boolean(activeItem)} moveDetail={moveDetail} onClose={() => setActiveIndex(null)} onRemove={removeActiveItem} />
+      <ItemDetail activeItem={activeItem} isOpen={Boolean(activeItem)} moveDetail={moveDetail} onClose={() => setActiveIndex(null)} onRemove={handleRemoveClick} isConfirmOpen={isConfirmOpen} onConfirmRemove={removeActiveItem} onCancelRemove={handleCancelRemove} />
 
       <UploadDialog
         aiAvailable={session.aiAvailable}
@@ -382,7 +392,7 @@ function EmptyState({ loading, onOpenUpload, signedIn, visible }) {
   );
 }
 
-function ItemDetail({ activeItem, isOpen, moveDetail, onClose, onRemove }) {
+function ItemDetail({ activeItem, isOpen, moveDetail, onClose, onRemove, isConfirmOpen, onConfirmRemove, onCancelRemove }) {
   return (
     <div className={`detail-overlay${isOpen ? " is-open" : ""}`} aria-hidden={!isOpen} id="detailOverlay">
       <button className="overlay-hitarea" type="button" aria-label="Close item detail" onClick={onClose} />
@@ -410,6 +420,16 @@ function ItemDetail({ activeItem, isOpen, moveDetail, onClose, onRemove }) {
             <span aria-hidden="true">›</span>
           </button>
         </section>
+      ) : null}
+
+      {isConfirmOpen ? (
+        <div className="confirm-overlay" role="dialog" aria-modal="true">
+          <div className="confirm-card">
+            <p className="confirm-message">Are you sure you want to delete this item from your wardrobe?</p>
+            <button className="confirm-yes" type="button" onClick={onConfirmRemove}>Yes</button>
+            <button className="confirm-cancel" type="button" onClick={onCancelRemove}>Cancel</button>
+          </div>
+        </div>
       ) : null}
     </div>
   );
