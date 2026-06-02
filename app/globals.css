@@ -401,7 +401,7 @@ select {
   display: grid;
   place-items: center;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.073);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 6px;
 }
 
@@ -411,7 +411,11 @@ select {
   width: 260px;
   padding: 28px 24px;
   border-radius: 16px;
-  background: #ebe9e942;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   text-align: center;
 }
 
@@ -425,19 +429,19 @@ select {
 .confirm-yes {
   width: 100%;
   padding: 12px 0;
-  border: 0;
+  border: 1.5px solid #cc0000;
   border-radius: 10px;
-  background: #f4b8b8;
-  color: var(--text);
+  background: transparent;
+  color: #cc0000;
   cursor: pointer;
   font: inherit;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color 140ms ease;
+  transition: background-color 140ms ease, color 140ms ease;
 }
 
 .confirm-yes:hover {
-  background: #edaaaa;
+  background: rgba(204, 0, 0, 0.08);
 }
 
 .confirm-cancel {
@@ -449,6 +453,8 @@ select {
   cursor: pointer;
   font: inherit;
   font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .nav-arrow {
