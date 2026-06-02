@@ -193,7 +193,7 @@ select {
 .profile-panel {
   display: grid;
   gap: 8px;
-  width: 120px;
+  width: 140px;
   margin-top: auto;
 }
 
@@ -203,7 +203,7 @@ select {
 
 .profile-identity {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-columns: 36px minmax(0, 1fr);
   gap: 8px;
   align-items: center;
 }
@@ -211,13 +211,13 @@ select {
 .profile-avatar {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: #fff;
   color: #6f6f6f;
-  font-size: 10px;
+  font-size: 11px;
   object-fit: cover;
 }
 
@@ -235,8 +235,8 @@ select {
 }
 
 .profile-copy strong {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .profile-copy span,
@@ -257,6 +257,24 @@ select {
 .profile-action:hover,
 .profile-action--primary {
   color: var(--text);
+}
+
+.profile-btn {
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
+  transition: background-color 140ms ease;
+}
+
+.profile-btn:hover {
+  background: #e4e4e4;
 }
 
 .google-signin-btn {
