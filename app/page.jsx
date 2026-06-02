@@ -36,8 +36,8 @@ export default function Home() {
   const fileInputRef = useRef(null);
 
   const activeItem = activeIndex === null ? null : items[activeIndex];
-  const hasModal = isUploadOpen || (activeIndex !== null && !isConfirmOpen);
-
+  const hasModal = activeIndex !== null || isUploadOpen;
+  
   useEffect(() => {
     let cancelled = false;
 
