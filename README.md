@@ -24,11 +24,12 @@ DATABASE_URL="postgresql://..."
 BLOB_READ_WRITE_TOKEN="..."
 ```
 
-Optional AI sorting:
+Optional AI garment review and cleanup:
 
 ```bash
 OPENAI_API_KEY="..."
-OPENAI_CLOTHING_MODEL="gpt-5.4-mini"
+OPENAI_CLOTHING_MODEL="gpt-5.5"
+OPENAI_IMAGE_MODEL="gpt-image-1.5"
 ```
 
 ## Google Sign-In
@@ -70,8 +71,11 @@ Uploaded files go directly from the browser to Vercel Blob. The app stores the r
 
 1. User signs in with Google.
 2. User chooses an image.
-3. Browser uploads the image directly to Vercel Blob.
-4. The API saves item metadata and the Blob URL to Postgres.
-5. The wardrobe grid reads items from Postgres for the signed-in user only.
+3. Browser uploads the raw image directly to Vercel Blob.
+4. In AI mode, `/api/wardrobe/analyze` reviews the image and returns category metadata plus a normalized garment selection box.
+5. The user sees the selection outline, edits fields if needed, and confirms.
+6. `/api/wardrobe/upload` uses the OpenAI image edits endpoint to create a clean white-background catalog asset.
+7. The clean Blob URL and item metadata are saved to Postgres.
+8. The wardrobe grid reads items from Postgres for the signed-in user only.
 
-If AI sorting is unavailable or fails, the selected upload category is used.
+Manual mode skips AI review and saves the uploaded image as-is.

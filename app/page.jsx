@@ -33,6 +33,8 @@ export default function Home() {
   const [uploadError, setUploadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingBlob, setPendingBlob] = useState(null);
+  const [aiReview, setAiReview] = useState(null);
   const fileInputRef = useRef(null);
 
   const activeItem = activeIndex === null ? null : items[activeIndex];
@@ -120,12 +122,18 @@ export default function Home() {
 
   function openUpload() {
     setUploadError("");
+    setUpload((current) => ({
+      ...current,
+      sortMode: session.aiAvailable ? "ai" : "manual",
+    }));
     setIsUploadOpen(true);
   }
 
   function closeUpload() {
     setIsUploadOpen(false);
     setUploadError("");
+    setAiReview(null);
+    setPendingBlob(null);
   }
 
   function handleUploadChange(event) {
@@ -139,6 +147,8 @@ export default function Home() {
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
+    setAiReview(null);
+    setPendingBlob(null);
 
     setUpload((current) => ({
       ...current,
@@ -171,16 +181,49 @@ export default function Home() {
       return;
     }
 
-    let blob;
+    let blob = pendingBlob;
 
-    try {
-      blob = await uploadBlob(`wardrobe/${session.user.id}/${cleanFileName(file.name)}`, file, {
-        access: "public",
-        handleUploadUrl: "/api/wardrobe/blob",
+    if (!blob) {
+      try {
+        blob = await uploadBlob(`wardrobe/${session.user.id}/${cleanFileName(file.name)}`, file, {
+          access: "public",
+          handleUploadUrl: "/api/wardrobe/blob",
+        });
+        setPendingBlob(blob);
+      } catch (error) {
+        setIsSubmitting(false);
+        setUploadError(error.message || "Image upload failed");
+        return;
+      }
+    }
+
+    if (upload.sortMode === "ai" && !aiReview) {
+      const response = await fetch("/api/wardrobe/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageUrl: blob.url,
+        }),
       });
-    } catch (error) {
+
+      const result = await response.json();
       setIsSubmitting(false);
-      setUploadError(error.message || "Image upload failed");
+
+      if (!response.ok) {
+        setUploadError(result.error || "AI review failed");
+        return;
+      }
+
+      setAiReview(result.review);
+      setUpload((current) => ({
+        ...current,
+        brand: current.brand || result.review.brand || "",
+        category: result.review.category || current.category,
+        color: current.color || result.review.color || "",
+        name: current.name || result.review.name || "",
+      }));
       return;
     }
 
@@ -194,6 +237,7 @@ export default function Home() {
         category: upload.category,
         color: upload.color,
         imageUrl: blob.url,
+        aiReview,
         name: upload.name,
         pathname: blob.pathname,
         sortMode: upload.sortMode,
@@ -211,6 +255,8 @@ export default function Home() {
     setItems((current) => [result.item, ...current]);
     setUpload(emptyUpload);
     setPreviewUrl("");
+    setPendingBlob(null);
+    setAiReview(null);
     event.currentTarget.reset();
     closeUpload();
   }
@@ -329,7 +375,9 @@ export default function Home() {
         onClose={closeUpload}
         onFileChange={handleFileChange}
         onSubmit={handleUploadSubmit}
+        aiReview={aiReview}
         previewUrl={previewUrl}
+        pendingBlob={pendingBlob}
         upload={upload}
       />
     </>
@@ -435,8 +483,11 @@ function ItemDetail({ activeItem, isOpen, moveDetail, onClose, onRemove, isConfi
   );
 }
 
-function UploadDialog({ aiAvailable, blobConfigured, databaseConfigured, error, fileInputRef, isOpen, isSubmitting, onChange, onClose, onFileChange, onSubmit, previewUrl, upload }) {
+function UploadDialog({ aiAvailable, aiReview, blobConfigured, databaseConfigured, error, fileInputRef, isOpen, isSubmitting, onChange, onClose, onFileChange, onSubmit, pendingBlob, previewUrl, upload }) {
   const storageReady = blobConfigured && databaseConfigured;
+  const needsAiReview = aiAvailable && upload.sortMode === "ai" && previewUrl && !aiReview;
+  const canSaveCleanItem = aiAvailable && upload.sortMode === "ai" && aiReview;
+  const submitLabel = isSubmitting ? (needsAiReview ? "Reviewing" : "Saving") : needsAiReview ? "Review" : canSaveCleanItem ? "Save clean item" : "Save";
 
   return (
     <div className={`upload-overlay${isOpen ? " is-open" : ""}`} aria-hidden={!isOpen}>
@@ -445,7 +496,26 @@ function UploadDialog({ aiAvailable, blobConfigured, databaseConfigured, error, 
       {isOpen ? (
         <form className="upload-card" onSubmit={onSubmit}>
           <div className="upload-preview">
-            {previewUrl ? <img alt="" src={previewUrl} /> : <button type="button" onClick={() => fileInputRef.current?.click()}>Choose image</button>}
+            {previewUrl ? (
+              <div className="upload-preview-inner">
+                <img alt="" src={previewUrl} />
+                {aiReview?.selection ? (
+                  <span
+                    className="garment-selection"
+                    style={{
+                      height: `${aiReview.selection.height * 100}%`,
+                      left: `${aiReview.selection.x * 100}%`,
+                      top: `${aiReview.selection.y * 100}%`,
+                      width: `${aiReview.selection.width * 100}%`,
+                    }}
+                  />
+                ) : null}
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileInputRef.current?.click()}>
+                Choose image
+              </button>
+            )}
           </div>
 
           <input accept="image/jpeg,image/png,image/webp,image/gif" className="file-input" name="image" onChange={onFileChange} ref={fileInputRef} required type="file" />
@@ -491,6 +561,8 @@ function UploadDialog({ aiAvailable, blobConfigured, databaseConfigured, error, 
             </div>
           ) : null}
 
+          {pendingBlob && needsAiReview ? <p className="upload-note">Image uploaded. Review the AI selection next.</p> : null}
+          {aiReview ? <p className="upload-note">AI selected the garment. Edit the fields if needed, then save the cleaned item.</p> : null}
           {!storageReady ? <p className="upload-error">Connect Vercel Blob and Postgres before uploading.</p> : null}
           {error ? <p className="upload-error">{error}</p> : null}
 
@@ -499,7 +571,7 @@ function UploadDialog({ aiAvailable, blobConfigured, databaseConfigured, error, 
               Cancel
             </button>
             <button className="upload-submit" disabled={isSubmitting || !storageReady} type="submit">
-              {isSubmitting ? "Saving" : "Save"}
+              {submitLabel}
             </button>
           </div>
         </form>

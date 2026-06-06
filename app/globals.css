@@ -519,11 +519,27 @@ select {
   overflow: hidden;
 }
 
+.upload-preview-inner {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 318px;
+}
+
 .upload-preview img {
   display: block;
   width: 90%;
   height: 90%;
   object-fit: contain;
+}
+
+.garment-selection {
+  position: absolute;
+  border: 4px solid rgba(255, 255, 255, 0.96);
+  border-radius: 22px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18), 0 10px 24px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
 }
 
 .upload-preview button {
@@ -608,6 +624,14 @@ select {
   margin: 0;
   color: #8b2020;
   font-size: 11px;
+}
+
+.upload-note {
+  grid-column: 2;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .upload-actions {
@@ -704,8 +728,13 @@ select {
     min-height: 250px;
   }
 
+  .upload-preview-inner {
+    height: 250px;
+  }
+
   .upload-mode,
   .upload-error,
+  .upload-note,
   .upload-actions {
     grid-column: 1;
   }
