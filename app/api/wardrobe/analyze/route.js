@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "../../../../lib/auth";
-import { analyzeClothingImage } from "../../../../lib/clothing-ai";
+import { analyzeClothingImage, getSafeAIErrorMessage } from "../../../../lib/clothing-ai";
 
 export const runtime = "nodejs";
 
@@ -21,6 +21,6 @@ export async function POST(request) {
     const review = await analyzeClothingImage({ imageUrl });
     return NextResponse.json({ review });
   } catch (error) {
-    return NextResponse.json({ error: error.message || "AI review failed" }, { status: 502 });
+    return NextResponse.json({ error: getSafeAIErrorMessage(error, "AI review failed") }, { status: error.status || 502 });
   }
 }

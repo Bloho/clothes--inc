@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { del, put } from "@vercel/blob";
 import { categories, isValidCategory } from "../../../../lib/categories";
 import { getSession } from "../../../../lib/auth";
-import { analyzeClothingImage, createCleanClothingAsset } from "../../../../lib/clothing-ai";
+import { analyzeClothingImage, createCleanClothingAsset, getSafeAIErrorMessage } from "../../../../lib/clothing-ai";
 import { addWardrobeItem } from "../../../../lib/storage";
 import { isDatabaseConfigured } from "../../../../lib/db";
 
@@ -63,7 +63,7 @@ export async function POST(request) {
         await del(pathname).catch(() => {});
       }
     } catch (error) {
-      return NextResponse.json({ error: error.message || "AI cleanup failed" }, { status: 502 });
+      return NextResponse.json({ error: getSafeAIErrorMessage(error, "AI cleanup failed") }, { status: error.status || 502 });
     }
   }
 
